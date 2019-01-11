@@ -46,7 +46,6 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 			 unsigned int costs = abss + location; //- elevator.GetRequestVector().begin();
 				if(min > costs ) min = costs;
 		}
-
 	}
 }
 
