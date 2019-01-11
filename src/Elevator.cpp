@@ -3,11 +3,11 @@
 
 #include "Elevators.h"
 
-//自定义排序函数
-bool SortByM1(const unsigned int &v1, const unsigned int &v2) //注意：本函数的参数的类型一定要与vector中元素的类型一致
-{
-	return v1 > v2; //升序排列
-}
+// //自定义排序函数
+// bool SortByM1(const unsigned int &v1, const unsigned int &v2) //注意：本函数的参数的类型一定要与vector中元素的类型一致
+// {
+// 	return v1 > v2; //升序排列
+// }
 
 Elevator::Elevator(
 	const unsigned int aId,
@@ -30,17 +30,11 @@ Elevator::Elevator(
 void Elevator::SelectFloor(const unsigned int aFloorId)
 {
 	q.push_back(aFloorId);
-	if (myCurrentDirection == Direction::Up)
-	{
-		std::sort(q.begin(), q.end(), SortByM1);
-	}
-	else
-	{
-		std::sort(q.begin(), q.end());
-	}
+	q.sort(); //todo:insert
+
 	// Implement me!
 }
-std::vector<unsigned int> Elevator::GetRequestVector() const
+std::list<unsigned int> Elevator::GetRequestList() const
 {
 	return q;
 }
@@ -58,52 +52,60 @@ Elevator::CurrentDirection() const
 
 bool Elevator::HasWork() const
 {
-	if (q.size())
+
+	if (q.empty() || (myCurrentDirection == Direction::Down && (int)myCurrentFloor <= 1) || (myCurrentDirection == Direction::Up && myCurrentFloor >= myFloorCount))
+	{
+		return false;
+	}else if (q.size())
 	{
 
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
 	// Implement me!
 }
 
 void Elevator::Step()
 {
-	if (HasWork())
-	{
-		if (myCurrentDirection == Direction::Stop)
-		{
-			myCurrentDirection = (int)(q.back() - myCurrentFloor) > 0 ? Direction::Up : Direction::Down;
-		}
+	// if (HasWork())
+	// {
+	// if (myCurrentDirection == Direction::Stop)
+	// {
+	// 	myCurrentDirection = (int)(q.back() - myCurrentFloor) > 0 ? Direction::Up : Direction::Down;
+	// }
 
-		if (myCurrentDirection == Direction::Down)
-		{
-			myCurrentFloor--;
-			if (myCurrentFloor == q.back())
-			{
-				q.pop_back();
-				MessageElevatorArrived message = {myId, myCurrentFloor};
-				SEND_TO_HUMANS(message);
-			}
-		}
-		else if (myCurrentDirection == Direction::Up)
-		{
-			myCurrentFloor++;
-			if (myCurrentFloor == q.back())
-			{
-				q.pop_back();
-				MessageElevatorArrived message = {myId, myCurrentFloor};
-				SEND_TO_HUMANS(message);
-			}
-		}
-	}
-	else
+	if (myCurrentDirection == Direction::Down)
 	{
-		myCurrentDirection = Direction::Stop; //转变方向和停止该线程
+		if (!HasWork())
+			myCurrentDirection = Direction::Up;
+		myCurrentFloor--;
+		if (myCurrentFloor == q.back())
+		{
+			q.pop_back();
+			if (!HasWork())
+				myCurrentDirection = Direction::Up;
+			MessageElevatorArrived message = {myId, myCurrentFloor};
+			SEND_TO_HUMANS(message);
+		}
 	}
+	else if (myCurrentDirection == Direction::Up)
+	{
+		if (!HasWork())
+			myCurrentDirection = Direction::Down;
+		myCurrentFloor++;
+		if (myCurrentFloor == q.front())
+		{
+			q.pop_front();
+
+			MessageElevatorArrived message = {myId, myCurrentFloor};
+			SEND_TO_HUMANS(message);
+		}
+	}
+	// }
+	// else
+	// {
+	// 	myCurrentDirection = Direction::Stop; //转变方向和停止该线程
+	// }
 	// Implement me!
 }
 

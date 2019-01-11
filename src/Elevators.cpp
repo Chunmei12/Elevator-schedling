@@ -1,7 +1,7 @@
 #include "MessageBus.h"
 #include "stdlib.h"
 #include "Elevators.h"
-#include<algorithm>
+#include <algorithm>
 using namespace std;
 Elevators::Elevators()
 {
@@ -13,7 +13,7 @@ void Elevators::Start()
 	REGISTER_ELEVATOR(MessageElevatorStep, Elevators::OnMessageElevatorStep);
 	REGISTER_ELEVATOR(MessageElevatorRequest, Elevators::OnMessageElevatorRequest);
 
-	myElevators.push_back(Elevator{1, 10, 6, Direction::Down});
+	myElevators.push_back(Elevator{1, 10, 10, Direction::Down});
 	{
 		MessageElevatorStep message;
 		SEND_TO_ELEVATORS(message);
@@ -36,17 +36,54 @@ void Elevators::OnMessageElevatorCall(const MessageElevatorCall &aMessage)
 void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 {
 	//chose one elevator
-	unsigned int min;
+	auto &minElevator  = myElevators.front();
+	unsigned int minTimes;
 	for (auto &elevator : myElevators)
 	{
-		if (aMessage.myDirection == elevator.CurrentDirection() || elevator.CurrentDirection() == Direction::Stop)
+		int currentFloor = (int)elevator.CurrentFloor();
+		int topFloor = elevator.GetRequestList().back();
+		int bottomFloor = elevator.GetRequestList().front();
+		int times;
+		if (elevator.CurrentDirection() == Direction::Stop)
 		{
-			vector<unsigned int>::iterator location = lower_bound(elevator.GetRequestVector().begin(),elevator.GetRequestVector().end(), aMessage.myFloor);
-			 unsigned int abss =   abs(int(elevator.CurrentDirection() - aMessage.myFloor));
-			 unsigned int costs = abss + location; //- elevator.GetRequestVector().begin();
-				if(min > costs ) min = costs;
+
+			times = std::abs((int)aMessage.myFloor - currentFloor);
 		}
+		if (aMessage.myDirection == elevator.CurrentDirection())
+		{
+			if (aMessage.myDirection == Direction::Down)
+			{
+				if (aMessage.myFloor < elevator.CurrentFloor())
+				{
+					times = std::abs((int)aMessage.myFloor - currentFloor);
+				}
+			}
+			if (aMessage.myDirection == Direction::Up)
+			{
+				if (aMessage.myFloor > elevator.CurrentFloor())
+				{
+					times = std::abs((int)aMessage.myFloor - currentFloor);
+				}
+			}
+			// unsigned int index = GetPoint(elevator.GetRequestList(), aMessage.myFloor);
+		}
+
+
+		if (aMessage.myDirection != elevator.CurrentDirection())
+		{
+			if (aMessage.myDirection == Direction::Down)
+			{
+				times = std::abs(2 * topFloor - (int)aMessage.myFloor - currentFloor);
+			}
+			if (aMessage.myDirection == Direction::Up)
+			{
+				times = std::abs((int)aMessage.myFloor + currentFloor - 2 * bottomFloor);
+			}
+			// unsigned int index = GetPoint(elevator.GetRequestList(), aMessage.myFloor);
+		}
+		if(minTimes > times) { minTimes = times; minElevator = elevator;}
 	}
+	minElevator.SelectFloor(aMessage.myFloor);
 }
 
 void Elevators::OnMessageElevatorRequest(const MessageElevatorRequest &aMessage)

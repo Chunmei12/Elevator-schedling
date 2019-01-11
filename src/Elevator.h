@@ -5,7 +5,7 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <vector>
+#include <list>
 #include "Messages.h"
 
 enum Direction;
@@ -25,7 +25,7 @@ class Elevator
 
 	void SelectFloor(const unsigned int aFloorId);
 	unsigned int CurrentFloor() const;
-	std::vector <unsigned int>  GetRequestVector() const;
+	std::list <unsigned int>  GetRequestList() const;
 	Direction CurrentDirection() const;
 	bool HasWork() const;
 
@@ -38,6 +38,6 @@ class Elevator
 	unsigned int myId;
 	unsigned int myFloorCount;
 	unsigned int myCurrentFloor;
-	std::vector <unsigned int> q;
+	std::list <unsigned int> q;
 	Direction myCurrentDirection;
 };

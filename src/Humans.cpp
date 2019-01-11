@@ -72,8 +72,8 @@ void Humans::Start()
 	// REGISTER_HUMAN(MessageElevatorCall, Humans::OnMessageElevatorCall);
 
 	myHumans.push_back(Human(1, 4)); //refuse the two same floor number
-	myHumans.push_back(Human(2, 4)); //refuse the two same floor number
-	myHumans.push_back(Human(3, 4)); //refuse the two same floor number
+	myHumans.push_back(Human(6, 4)); //refuse the two same floor number
+	myHumans.push_back(Human(3, 10)); //refuse the two same floor number
 }
 
 void Humans::OnMessageElevatorReady(const MessageElevatorReady &aMessage)
@@ -88,7 +88,7 @@ void Humans::OnMessageElevatorReady(const MessageElevatorReady &aMessage)
 		if (human.GetState() == HumanState::HumanState_Idle)
 		{
 
-			MessageElevatorCall messageCall = {human.myFloor, (human.myDestinationFloor - human.myFloor) > 0 ? Direction::Up : Direction::Down}; //coding
+			MessageElevatorCall messageCall = {human.myFloor,(int) (human.myDestinationFloor - human.myFloor) > 0 ? Direction::Up : Direction::Down}; //coding
 			SEND_TO_ELEVATORS(messageCall);
 			human.SetStateWaiting();
 		}
