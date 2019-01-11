@@ -29,14 +29,28 @@ Elevator::Elevator(
 
 void Elevator::SelectFloor(const unsigned int aFloorId)
 {
-	q.push_back(aFloorId);
-	q.sort(); //todo:insert
+	// q.push_back(aFloorId);
+	// q.sort(); //todo:insert
 
 	// Implement me!
 }
-std::list<unsigned int> Elevator::GetRequestList() const
+void Elevator::InsertUpList(const unsigned int aFloorId)
 {
-	return q;
+	upList.push_back(aFloorId);
+	upList.sort(); //todo:insert
+}
+void Elevator::InsertDownList(const unsigned int aFloorId)
+{
+	downList.push_back(aFloorId);
+	downList.sort(); //todo:insert
+}
+std::list<unsigned int> Elevator::UpList() const
+{
+	return upList;
+}
+std::list<unsigned int> Elevator::DownList() const
+{
+	return downList;
 }
 unsigned int
 Elevator::CurrentFloor() const
@@ -53,53 +67,77 @@ Elevator::CurrentDirection() const
 bool Elevator::HasWork() const
 {
 
-	if (q.empty() || (myCurrentDirection == Direction::Down && (int)myCurrentFloor <= 1) || (myCurrentDirection == Direction::Up && myCurrentFloor >= myFloorCount))
-	{
-		return false;
-	}else if (q.size())
-	{
+	// if (q.empty() || (myCurrentDirection == Direction::Down && (int)myCurrentFloor <= 1) || (myCurrentDirection == Direction::Up && myCurrentFloor >= myFloorCount))
+	// {
+	return false;
+	// }
+	// else if (q.size())
+	// {
 
-		return true;
-	}
+	// return true;
+	// }
 
 	// Implement me!
 }
 
 void Elevator::Step()
 {
-	// if (HasWork())
-	// {
-	// if (myCurrentDirection == Direction::Stop)
-	// {
-	// 	myCurrentDirection = (int)(q.back() - myCurrentFloor) > 0 ? Direction::Up : Direction::Down;
-	// }
-
+	
 	if (myCurrentDirection == Direction::Down)
 	{
-		if (!HasWork())
-			myCurrentDirection = Direction::Up;
-		myCurrentFloor--;
-		if (myCurrentFloor == q.back())
+
+		if (myCurrentFloor == downList.back())
 		{
-			q.pop_back();
-			if (!HasWork())
-				myCurrentDirection = Direction::Up;
+			downList.pop_back();
+			// if (!HasWork())
+			// 	myCurrentDirection = Direction::Up;
 			MessageElevatorArrived message = {myId, myCurrentFloor};
 			SEND_TO_HUMANS(message);
 		}
+		if (myCurrentFloor > 1 && !downList.empty())
+		{
+			myCurrentFloor--;
+		}
+		if (myCurrentFloor <= 1 || downList.empty())
+		{
+			if (!downList.empty() && (upList.empty() || upList.back() < downList.back()))
+			{
+				// auto temp = downList;
+				upList.push_back(downList.back());
+			}
+			myCurrentDirection = Direction::Up;
+		}
+		// if (q.empty())
+		// 	myCurrentDirection = Direction::Up;
 	}
 	else if (myCurrentDirection == Direction::Up)
 	{
-		if (!HasWork())
-			myCurrentDirection = Direction::Down;
-		myCurrentFloor++;
-		if (myCurrentFloor == q.front())
+		// if (!HasWork())
+		// 	myCurrentDirection = Direction::Down;
+
+		if (myCurrentFloor == upList.front())
 		{
-			q.pop_front();
+			upList.pop_front();
 
 			MessageElevatorArrived message = {myId, myCurrentFloor};
 			SEND_TO_HUMANS(message);
 		}
+		if (myCurrentFloor < myFloorCount && !upList.empty())
+		{
+			myCurrentFloor++;
+		}
+		if (myCurrentFloor >= myFloorCount || upList.empty())
+		{
+			if (!upList.empty() && (downList.empty() || downList.front() > upList.front()))
+			{
+				auto temp = upList;
+				downList.push_front(upList.front());
+			}
+			myCurrentDirection = Direction::Down;
+		}
+
+		// if (q.empty())
+		// 	myCurrentDirection = Direction::Down;
 	}
 	// }
 	// else
