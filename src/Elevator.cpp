@@ -87,26 +87,25 @@ void Elevator::Step()
 
 	if (myCurrentDirection == Direction::Down)
 	{
-
-		if (myCurrentFloor == downList.back())
+      std::list< unsigned int>::iterator it = std::find( downList.begin(), downList.end(), myCurrentFloor ); //searche
+		if (it != downList.end())
 		{
-			downList.pop_back();
-			// if (!HasWork())
-			// 	myCurrentDirection = Direction::Up;
+			downList.erase(it);
 			MessageElevatorArrived message = {myId, myCurrentFloor};
 			SEND_TO_HUMANS(message);
 		}
-		if (myCurrentFloor > 1 && !downList.empty())
+		if ((myCurrentFloor > 1 && !downList.empty()) || (!upList.empty() && upList.back() < myCurrentFloor ))
 		{
 			myCurrentFloor--;
 		}
 		if (myCurrentFloor <= 1 || downList.empty())
 		{
-			if (!downList.empty() && (upList.empty() || upList.back() < downList.back()))
-			{
-				// auto temp = downList;
-				upList.push_back(downList.back());
-			}
+			// if (!downList.empty() && (upList.empty() || upList.back() < downList.back()))
+			// {
+			// 	// auto temp = downList;
+			// 	upList.push_back(downList.back());
+			// }
+			if( !(!upList.empty() && upList.back() < myCurrentFloor ))
 			myCurrentDirection = Direction::Up;
 		}
 		// if (q.empty())
@@ -116,25 +115,25 @@ void Elevator::Step()
 	{
 		// if (!HasWork())
 		// 	myCurrentDirection = Direction::Down;
-
-		if (myCurrentFloor == upList.front())
+   std::list< unsigned int>::iterator it = std::find( upList.begin(), upList.end(), myCurrentFloor ); //searche
+		if (it != upList.end())
 		{
-			upList.pop_front();
-
+			upList.erase(it);
 			MessageElevatorArrived message = {myId, myCurrentFloor};
 			SEND_TO_HUMANS(message);
 		}
-		if (myCurrentFloor < myFloorCount && !upList.empty())
+		if (((myCurrentFloor < myFloorCount && !upList.empty())|| ( !downList.empty() && downList.front() > myCurrentFloor )))
 		{
 			myCurrentFloor++;
 		}
 		if (myCurrentFloor >= myFloorCount || upList.empty())
 		{
-			if (!upList.empty() && (downList.empty() || downList.front() > upList.front()))
-			{
-				// auto temp = upList;
-				downList.push_front(upList.front());
-			}
+			// if (!upList.empty() && (downList.empty() || downList.front() > upList.front()))
+			// {
+			// 	// auto temp = upList;
+			// 	downList.push_front(upList.front());
+			// }
+			if( !(!downList.empty() && downList.front() > myCurrentFloor ))
 			myCurrentDirection = Direction::Down;
 		}
 
