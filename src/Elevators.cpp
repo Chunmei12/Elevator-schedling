@@ -130,9 +130,20 @@ void Elevators::OnMessageElevatorRequest(const MessageElevatorRequest &aMessage)
 			{
 				elevator.InsertUpList(aMessage.myFloor);
 			}
-			else
+			else if (elevator.CurrentFloor() > aMessage.myFloor)
 			{
 				elevator.InsertDownList(aMessage.myFloor);
+			}
+			else if (elevator.CurrentFloor() == aMessage.myFloor)
+			{
+				if (elevator.CurrentDirection() == Direction::Up)
+				{
+					elevator.InsertUpList(aMessage.myFloor);
+				}
+				else
+				{
+					elevator.InsertDownList(aMessage.myFloor);
+				}
 			}
 			break;
 		}

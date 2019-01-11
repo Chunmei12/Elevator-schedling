@@ -82,7 +82,9 @@ bool Elevator::HasWork() const
 
 void Elevator::Step()
 {
-	
+
+	if(!upList.empty() || !downList.empty()){
+
 	if (myCurrentDirection == Direction::Down)
 	{
 
@@ -130,7 +132,7 @@ void Elevator::Step()
 		{
 			if (!upList.empty() && (downList.empty() || downList.front() > upList.front()))
 			{
-				auto temp = upList;
+				// auto temp = upList;
 				downList.push_front(upList.front());
 			}
 			myCurrentDirection = Direction::Down;
@@ -139,6 +141,8 @@ void Elevator::Step()
 		// if (q.empty())
 		// 	myCurrentDirection = Direction::Down;
 	}
+	}
+
 	// }
 	// else
 	// {

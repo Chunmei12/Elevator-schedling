@@ -71,7 +71,7 @@ void Humans::Start()
 	REGISTER_HUMAN(MessageHumanStep, Humans::OnMessageHumanStep);
 	// REGISTER_HUMAN(MessageElevatorCall, Humans::OnMessageElevatorCall);
 
-	myHumans.push_back(Human(1, 4)); //refuse the two same floor number
+	// myHumans.push_back(Human(1, 4)); //refuse the two same floor number
 	// myHumans.push_back(Human(6, 4)); //refuse the two same floor number
 	// myHumans.push_back(Human(3, 9)); //refuse the two same floor number
 	// myHumans.push_back(Human(4, 5)); //refuse the two same floor number
