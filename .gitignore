@@ -1,0 +1,13 @@
+#binary obj file
+*.o
+/exec/
+#exe file
+Elevator
+
+#vscode setting
+settings.json
+.vscode
+
+#mac system file
+.DS_Store
+

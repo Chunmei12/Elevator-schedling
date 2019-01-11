@@ -1,0 +1,50 @@
+Basics about Elevator
+
+1. Non-homogeneous stochastic arrival of customers
+2. Two types of calls: internal and external
+3. Has a speed and direction at any point in time
+4. Doors open and close
+5. Stationary on a floor until doors close
+6. Customers can abandon call.
+
+Points of Interets 
+
+1. Expected wait time of users in the system
+2. Maximum wait time
+3. Expected number of people whose wait time is
+4. substantially greater than the expected wait time
+(Quality of Service)
+5. Expected length of queue
+6. Energy used (Cost)
+7. inhabitants want to reach their destination comfortable
+
+Model Formulation 
+Arrivals
+    1.State and time-dependent arrival rates
+        1.1 Exogenous arrival rates on ground floor
+        1.2 Arrival rates on floors 2-8 are time dependent and floor occupancy dependent
+Elevator System
+    1.8 floors and 3 elevators
+    2.Doors remain open for 3 sec after last passenger enters
+    3.Elevators take 5 sec to traverse floor
+    4.Elevator has a capacity of 8 passenger
+
+Model Assumptions 
+
+Arrivals
+    1.Passengers arrive according to non-homogeneous, time-varying Poisson process
+    2.Passengers are very patient and do not abandon.
+         In fact, when passengers are blocked, they simply push the button again after the elevator departs.
+Elevator System
+    1.Passenger requests to go up or down
+    2.Western elevator system
+         Passenger assignments may not be changed
+    3.Destination floor distribution is time dependent
+         Beginning of day vs. lunch time & end of day
+
+concultions
+
+vmax dominates traveling time
+The model for the large height traveling time can be
+simplified into:
+ttravel = Stravel/vmax + (ta + tj)
