@@ -3,11 +3,6 @@
 
 #include "Elevators.h"
 
-// //自定义排序函数
-// bool SortByM1(const unsigned int &v1, const unsigned int &v2) //注意：本函数的参数的类型一定要与vector中元素的类型一致
-// {
-// 	return v1 > v2; //升序排列
-// }
 
 Elevator::Elevator(
 	const unsigned int aId,
@@ -27,22 +22,15 @@ Elevator::Elevator(
 	Log("[Elevator]", myId, "Created", ToString());
 }
 
-void Elevator::SelectFloor(const unsigned int aFloorId)
-{
-	// q.push_back(aFloorId);
-	// q.sort(); //todo:insert
-
-	// Implement me!
-}
 void Elevator::InsertUpList(const unsigned int aFloorId)
 {
 	upList.push_back(aFloorId);
-	upList.sort(); //todo:insert
+	upList.sort(); 
 }
 void Elevator::InsertDownList(const unsigned int aFloorId)
 {
 	downList.push_back(aFloorId);
-	downList.sort(); //todo:insert
+	downList.sort(); 
 }
 std::list<unsigned int> Elevator::UpList() const
 {
@@ -67,86 +55,63 @@ Elevator::CurrentDirection() const
 bool Elevator::HasWork() const
 {
 
-	// if (q.empty() || (myCurrentDirection == Direction::Down && (int)myCurrentFloor <= 1) || (myCurrentDirection == Direction::Up && myCurrentFloor >= myFloorCount))
-	// {
 	return false;
-	// }
-	// else if (q.size())
-	// {
-
-	// return true;
-	// }
-
 	// Implement me!
 }
 
 void Elevator::Step()
 {
-
-	if(!upList.empty() || !downList.empty()){
-
-	if (myCurrentDirection == Direction::Down)
+	if (!upList.empty() || !downList.empty())
 	{
-      std::list< unsigned int>::iterator it = std::find( downList.begin(), downList.end(), myCurrentFloor ); //searche
-		if (it != downList.end())
+		if (myCurrentDirection == Direction::Down)
 		{
-			downList.erase(it);
-			MessageElevatorArrived message = {myId, myCurrentFloor};
-			SEND_TO_HUMANS(message);
-		}
-		if ((myCurrentFloor > 1 && !downList.empty()) || (!upList.empty() && upList.back() < myCurrentFloor ))
-		{
-			myCurrentFloor--;
-		}
-		if (myCurrentFloor <= 1 || downList.empty())
-		{
-			// if (!downList.empty() && (upList.empty() || upList.back() < downList.back()))
-			// {
-			// 	// auto temp = downList;
-			// 	upList.push_back(downList.back());
-			// }
-			if( !(!upList.empty() && upList.back() < myCurrentFloor ))
-			myCurrentDirection = Direction::Up;
-		}
-		// if (q.empty())
-		// 	myCurrentDirection = Direction::Up;
-	}
-	else if (myCurrentDirection == Direction::Up)
-	{
-		// if (!HasWork())
-		// 	myCurrentDirection = Direction::Down;
-   std::list< unsigned int>::iterator it = std::find( upList.begin(), upList.end(), myCurrentFloor ); //searche
-		if (it != upList.end())
-		{
-			upList.erase(it);
-			MessageElevatorArrived message = {myId, myCurrentFloor};
-			SEND_TO_HUMANS(message);
-		}
-		if (((myCurrentFloor < myFloorCount && !upList.empty())|| ( !downList.empty() && downList.front() > myCurrentFloor )))
-		{
-			myCurrentFloor++;
-		}
-		if (myCurrentFloor >= myFloorCount || upList.empty())
-		{
-			// if (!upList.empty() && (downList.empty() || downList.front() > upList.front()))
-			// {
-			// 	// auto temp = upList;
-			// 	downList.push_front(upList.front());
-			// }
-			if( !(!downList.empty() && downList.front() > myCurrentFloor ))
-			myCurrentDirection = Direction::Down;
-		}
+			std::list<unsigned int>::iterator it = std::find(downList.begin(), downList.end(), myCurrentFloor); //searche
+			while (it != downList.end())
+			{
 
-		// if (q.empty())
-		// 	myCurrentDirection = Direction::Down;
-	}
-	}
+				downList.erase(it);
+				MessageElevatorArrived message = {myId, myCurrentFloor};
+				SEND_TO_HUMANS(message);
+				it = std::find(downList.begin(), downList.end(), myCurrentFloor);
+			}
 
-	// }
-	// else
-	// {
-	// 	myCurrentDirection = Direction::Stop; //转变方向和停止该线程
-	// }
+			if (myCurrentFloor <= 1 || (downList.empty() && !upList.empty() && upList.back() > myCurrentFloor && upList.front() > myCurrentFloor))
+			{
+				myCurrentDirection = Direction::Up;
+			}
+			else if (!downList.empty() && downList.front() >= myCurrentFloor && upList.empty())
+			{
+				myCurrentDirection = Direction::Up;
+			}
+			else
+			{
+				myCurrentFloor--;
+			}
+		}
+		else if (myCurrentDirection == Direction::Up)
+		{
+			std::list<unsigned int>::iterator it = std::find(upList.begin(), upList.end(), myCurrentFloor); //searche
+			while (it != upList.end())
+			{
+				upList.erase(it);
+				MessageElevatorArrived message = {myId, myCurrentFloor};
+				SEND_TO_HUMANS(message);
+				it = std::find(upList.begin(), upList.end(), myCurrentFloor);
+			}
+			if (myCurrentFloor >= myFloorCount || (upList.empty() && !downList.empty() && downList.front() < myCurrentFloor && downList.back() < myCurrentFloor))
+			{
+				myCurrentDirection = Direction::Down;
+			}
+			else if (!upList.empty() && upList.back() <= myCurrentFloor && downList.empty())
+			{
+				myCurrentDirection = Direction::Down;
+			}
+			else 
+			{
+				myCurrentFloor++;
+			}
+		}
+	}
 	// Implement me!
 }
 

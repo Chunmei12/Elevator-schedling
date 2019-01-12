@@ -23,7 +23,6 @@ class Elevator
 		const unsigned int aCurrentFloor,
 		const Direction aDirection);
 
-	void SelectFloor(const unsigned int aFloorId);
 	unsigned int CurrentFloor() const;
 	std::list<unsigned int> UpList() const;
 	std::list<unsigned int> DownList() const;

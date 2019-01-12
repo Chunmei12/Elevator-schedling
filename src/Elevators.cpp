@@ -13,9 +13,10 @@ void Elevators::Start()
 	REGISTER_ELEVATOR(MessageElevatorStep, Elevators::OnMessageElevatorStep);
 	REGISTER_ELEVATOR(MessageElevatorRequest, Elevators::OnMessageElevatorRequest);
 
-	// myElevators.push_back(Elevator{1, 10, 6, Direction::Down});
+	myElevators.push_back(Elevator{1, 10, 6, Direction::Down});
 	myElevators.push_back(Elevator{2, 10, 1, Direction::Up});
 	// myElevators.push_back(Elevator{3, 10, 5, Direction::Up});
+	// myElevators.push_back(Elevator{4, 10, 8, Direction::Down});
 	{
 		MessageElevatorStep message;
 		SEND_TO_ELEVATORS(message);
@@ -29,46 +30,46 @@ void Elevators::Start()
 
 void Elevators::OnMessageElevatorCall(const MessageElevatorCall &aMessage)
 {
-	Log(aMessage.myFloor, aMessage.myDirection); //coding
 	Scheduling(aMessage);						 //scheduling
-												 // MessageElevatorRequest messageRequest = {e} SEND_TO_ELEVATORS(messageRequest)
-												 // Implement me!
 }
 
 void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 {
 	//chose one elevator
-	unsigned int elevatorId;
-	unsigned int minTimes = -1;
+	unsigned int elevatorId = 0;
+	int minTimes = -1;
 	for (auto &elevator : myElevators)
 	{
 		int currentFloor = (int)elevator.CurrentFloor();
 		int topInUpList = elevator.UpList().empty() ? 0 : elevator.UpList().back();
-		int bottomnUpList = elevator.UpList().empty() ? 0 : elevator.UpList().front();
-		int topnDownList = elevator.DownList().empty() ? 0 : elevator.DownList().back();
-		int bottomnDownList = elevator.DownList().empty() ? 0 : elevator.DownList().front();
+		int bottomInUpList = elevator.UpList().empty() ? 0 : elevator.UpList().front();
+		int topInDownList = elevator.DownList().empty() ? 0 : elevator.DownList().back();
+		int bottomInDownList = elevator.DownList().empty() ? 0 : elevator.DownList().front();
 		int times = -1;
-		// if (elevator.CurrentDirection() == Direction::Stop)
-		// {
-		// 	times = std::abs((int)aMessage.myFloor - currentFloor);
-		// }
 		if (aMessage.myDirection == elevator.CurrentDirection())
 		{
 			if (aMessage.myDirection == Direction::Down)
 			{
-				if (aMessage.myFloor < elevator.CurrentFloor())
+				if (aMessage.myFloor <= elevator.CurrentFloor())
 				{
 					times = std::abs((int)aMessage.myFloor - currentFloor);
+				}
+				else
+				{
+					times = std::abs(currentFloor - bottomInDownList + topInUpList - bottomInUpList + topInDownList - (int)aMessage.myFloor);
 				}
 			}
 			if (aMessage.myDirection == Direction::Up)
 			{
-				if (aMessage.myFloor > elevator.CurrentFloor())
+				if (aMessage.myFloor >= elevator.CurrentFloor())
 				{
 					times = std::abs((int)aMessage.myFloor - currentFloor);
 				}
+				else
+				{
+					times = std::abs(topInUpList - currentFloor + topInDownList - bottomInDownList + (int)aMessage.myFloor - bottomInDownList);
+				}
 			}
-			// unsigned int index = GetPoint(elevator.GetRequestList(), aMessage.myFloor);
 		}
 
 		if (aMessage.myDirection != elevator.CurrentDirection())
@@ -92,17 +93,15 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 				}
 				else
 				{
-					times = std::abs(currentFloor + (int)aMessage.myFloor - 2 * bottomnDownList);
+					times = std::abs(currentFloor + (int)aMessage.myFloor - 2 * bottomInDownList);
 				}
 			}
-			// unsigned int index = GetPoint(elevator.GetRequestList(), aMessage.myFloor);
 		}
 		if (minTimes > times || minTimes == -1)
 		{
 			minTimes = times;
 			elevatorId = elevator.Id();
 		}
-		// elevator.InsertUpList(aMessage.myFloor); //delete
 	}
 	for (auto &elevator : myElevators)
 	{
@@ -117,7 +116,9 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 				elevator.InsertDownList(aMessage.myFloor);
 			}
 		}
+
 	}
+
 }
 
 void Elevators::OnMessageElevatorRequest(const MessageElevatorRequest &aMessage)
