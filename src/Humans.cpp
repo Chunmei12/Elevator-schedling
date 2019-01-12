@@ -75,7 +75,7 @@ void Humans::Start()
 	myHumans.push_back(Human(6, 4)); 
 	myHumans.push_back(Human(3, 9)); 
 	myHumans.push_back(Human(4, 5)); 
-	myHumans.push_back(Human(4, 1)); 
+	// myHumans.push_back(Human(4, 1)); 
 	myHumans.push_back(Human(7, 1)); 
 }
 

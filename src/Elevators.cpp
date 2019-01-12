@@ -30,58 +30,67 @@ void Elevators::Start()
 
 void Elevators::OnMessageElevatorCall(const MessageElevatorCall &aMessage)
 {
-	Scheduling(aMessage);						 //scheduling
+	Scheduling(aMessage); 
 }
 
 void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 {
-	//chose one elevator
 	unsigned int elevatorId = 0;
 	int minTimes = -1;
+	int currentFloor;
+	int currentDirection;
 	for (auto &elevator : myElevators)
 	{
-		int currentFloor = (int)elevator.CurrentFloor();
+		currentFloor = (int)elevator.CurrentFloor();
+		currentDirection = elevator.CurrentDirection();
 		int topInUpList = elevator.UpList().empty() ? 0 : elevator.UpList().back();
 		int bottomInUpList = elevator.UpList().empty() ? 0 : elevator.UpList().front();
 		int topInDownList = elevator.DownList().empty() ? 0 : elevator.DownList().back();
 		int bottomInDownList = elevator.DownList().empty() ? 0 : elevator.DownList().front();
 		int times = -1;
-		if (aMessage.myDirection == elevator.CurrentDirection())
+		// FD-SCAN ALGORITHEM
+		if (aMessage.myDirection == currentDirection)
 		{
 			if (aMessage.myDirection == Direction::Down)
 			{
-				if (aMessage.myFloor <= elevator.CurrentFloor())
+				if (aMessage.myFloor <= currentFloor)
 				{
+					// the down direction, and the new call is in the current way
 					times = std::abs((int)aMessage.myFloor - currentFloor);
 				}
 				else
 				{
+					// the down  direction, and the new call is out of the current way
 					times = std::abs(currentFloor - bottomInDownList + topInUpList - bottomInUpList + topInDownList - (int)aMessage.myFloor);
 				}
 			}
 			if (aMessage.myDirection == Direction::Up)
 			{
-				if (aMessage.myFloor >= elevator.CurrentFloor())
+				if (aMessage.myFloor >= currentFloor)
 				{
+					// the up direction, and the new call is in the current way
 					times = std::abs((int)aMessage.myFloor - currentFloor);
 				}
 				else
 				{
+					// the up direction, and the new call is out of the current way
 					times = std::abs(topInUpList - currentFloor + topInDownList - bottomInDownList + (int)aMessage.myFloor - bottomInDownList);
 				}
 			}
 		}
 
-		if (aMessage.myDirection != elevator.CurrentDirection())
+		if (aMessage.myDirection != currentDirection)
 		{
 			if (aMessage.myDirection == Direction::Down)
 			{
 				if (topInUpList == 0)
 				{
+					// the opposite direction, no up call waiting
 					times = std::abs(currentFloor - (int)aMessage.myFloor);
 				}
 				else
 				{
+					// the opposite direction, has other up call waiting
 					times = std::abs(2 * topInUpList - currentFloor - (int)aMessage.myFloor);
 				}
 			}
@@ -89,20 +98,26 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 			{
 				if (topInUpList == 0)
 				{
+					// the opposite direction,no down call waiting
 					times = std::abs(currentFloor - (int)aMessage.myFloor);
 				}
 				else
 				{
+					// the opposite direction, has other down call waiting
 					times = std::abs(currentFloor + (int)aMessage.myFloor - 2 * bottomInDownList);
 				}
 			}
 		}
+
+		//get the elevator who costs the minimum of time
 		if (minTimes > times || minTimes == -1)
 		{
 			minTimes = times;
 			elevatorId = elevator.Id();
 		}
 	}
+
+	// insert the new external call into the elevator list was selected by the FD-SCAN algorithem
 	for (auto &elevator : myElevators)
 	{
 		if (elevator.Id() == elevatorId)
@@ -115,41 +130,34 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 			{
 				elevator.InsertDownList(aMessage.myFloor);
 			}
+			break;
 		}
-
 	}
-
 }
 
 void Elevators::OnMessageElevatorRequest(const MessageElevatorRequest &aMessage)
 {
+	// Implement me!
+	// make a request
+	int currentFloor;
+	int currentDirection;
 	for (auto &elevator : myElevators)
 	{
+		currentFloor = elevator.CurrentFloor();
+		currentDirection = elevator.CurrentDirection();
 		if (elevator.Id() == aMessage.myElevatorId)
 		{
-			if (elevator.CurrentFloor() < aMessage.myFloor)
+			if (currentDirection == Direction::Up)
 			{
 				elevator.InsertUpList(aMessage.myFloor);
 			}
-			else if (elevator.CurrentFloor() > aMessage.myFloor)
+			else
 			{
 				elevator.InsertDownList(aMessage.myFloor);
-			}
-			else if (elevator.CurrentFloor() == aMessage.myFloor)
-			{
-				if (elevator.CurrentDirection() == Direction::Up)
-				{
-					elevator.InsertUpList(aMessage.myFloor);
-				}
-				else
-				{
-					elevator.InsertDownList(aMessage.myFloor);
-				}
 			}
 			break;
 		}
 	}
-	// Implement me!
 }
 
 void Elevators::OnMessageElevatorStep(const MessageElevatorStep &aMessage)

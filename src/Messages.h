@@ -6,8 +6,7 @@
 enum Direction
 {
 	Up = 0,
-	Down,
-	Stop  //add a state
+	Down
 };
 
 class MessageElevatorReady
