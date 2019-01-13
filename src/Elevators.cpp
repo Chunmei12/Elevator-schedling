@@ -1,7 +1,8 @@
-#include "MessageBus.h"
-#include "stdlib.h"
-#include "Elevators.h"
 #include <algorithm>
+#include "stdlib.h"
+#include "MessageBus.h"
+#include "Elevators.h"
+#include "Threads.h"
 using namespace std;
 Elevators::Elevators()
 {
@@ -15,8 +16,7 @@ void Elevators::Start()
 
 	myElevators.push_back(Elevator{1, 10, 6, Direction::Down});
 	myElevators.push_back(Elevator{2, 10, 1, Direction::Up});
-	// myElevators.push_back(Elevator{3, 10, 5, Direction::Up});
-	// myElevators.push_back(Elevator{4, 10, 8, Direction::Down});
+	myElevators.push_back(Elevator{3, 10, 8, Direction::Down});
 	{
 		MessageElevatorStep message;
 		SEND_TO_ELEVATORS(message);
@@ -120,8 +120,10 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 	// insert the new external call into the elevator list was selected by the FD-SCAN algorithem
 	for (auto &elevator : myElevators)
 	{
+		
 		if (elevator.Id() == elevatorId)
 		{
+			Log(elevatorId );
 			if (aMessage.myDirection == Direction::Up)
 			{
 				elevator.InsertUpList(aMessage.myFloor);
@@ -167,6 +169,7 @@ void Elevators::OnMessageElevatorStep(const MessageElevatorStep &aMessage)
 	{
 		Log("[Elevators", elevator.Id(), "] Step", elevator.ToString());
 		elevator.Step();
+	
 	}
 
 	MessageElevatorStep message;

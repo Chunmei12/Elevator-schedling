@@ -22,7 +22,7 @@ class Threads
 		std::function<void()> aWork);
 
 	void Wait();
-
+    void Timer(std::function<void()> func, unsigned int interval);
   private:
 	Threads(){};
 
@@ -39,4 +39,5 @@ class Threads
 	std::vector< std::function<void()> > myHumansWork;
 	std::condition_variable myHumansCv;
 	std::mutex myHumansMutex;
+
 };

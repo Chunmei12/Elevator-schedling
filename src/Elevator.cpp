@@ -1,6 +1,5 @@
 #include "Elevator.h"
 #include "MessageBus.h"
-
 #include "Elevators.h"
 
 Elevator::Elevator(
@@ -77,7 +76,7 @@ void Elevator::Step()
 			while (it != downList.end())
 			{
 				downList.erase(it);
-				MessageElevatorArrived message = {myId, myCurrentFloor};
+				MessageElevatorArrived message = {myId, myCurrentFloor, Direction::Down};
 				SEND_TO_HUMANS(message);
 				it = std::find(downList.begin(), downList.end(), myCurrentFloor);
 			}
@@ -102,7 +101,7 @@ void Elevator::Step()
 			while (it != upList.end())
 			{
 				upList.erase(it);
-				MessageElevatorArrived message = {myId, myCurrentFloor};
+				MessageElevatorArrived message = {myId, myCurrentFloor, Direction::Up};
 				SEND_TO_HUMANS(message);
 				it = std::find(upList.begin(), upList.end(), myCurrentFloor);
 			}

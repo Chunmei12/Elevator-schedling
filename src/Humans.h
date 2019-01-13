@@ -53,9 +53,8 @@ class Humans
 
 	void OnMessageHumanStep(
 		const MessageHumanStep &aMessage);
-
-	// void OnMessageElevatorCall(
-	// 	const MessageElevatorCall &aMessage); //call a elevator
+  
+	void GenerateHuman();
 
   private:
 	std::vector<Human> myHumans;

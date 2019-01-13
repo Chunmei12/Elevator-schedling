@@ -17,13 +17,10 @@ threadsDepth = src/Threads.h
 utils = src/Utils.cpp
 utilsDepth = src/Utils.h
 
-sorts = src/Sorts.cpp
-utilsDepth = src/Sorts.h
-
 main = src/main.cpp
 mainDepth = src/Elevators.h src/MessageBus.h src/Humans.h src/Threads.h
 
-objFile = main.o Threads.o Elevator.o Elevators.o Humans.o  Utils.o Sorts.o
+objFile = main.o Threads.o Elevator.o Elevators.o Humans.o  Utils.o
 
 command = clang++ -std=c++11 -stdlib=libc++ -Wall 
 # -Wextra -pedantic
@@ -39,8 +36,6 @@ Threads.o : $(threads) $(threadsDepth)
 	$(command) -c $(threads)
 Utils.o : $(utils) $(utilsDepth)
 	$(command) -c $(utils)
-Sorts.o : $(sorts) $(sortssDepth)
-	$(command) -c $(sorts)
 main.o : $(main) $(mainDepth)
 	$(command) -c $(main)
 clean :

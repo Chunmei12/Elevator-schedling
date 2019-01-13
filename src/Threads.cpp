@@ -1,16 +1,13 @@
 #include <chrono>
-
+#include "Utils.h"
 #include "Threads.h"
-
 // Shrink this number to make the system go faster.
 static const unsigned int locThreadWaitTimeMs = 1000;
-
-void
-Threads::ElevatorWorker()
+void Threads::ElevatorWorker()
 {
 	std::vector<std::function<void()>> work;
 
-	while(true)
+	while (true)
 	{
 		{
 			std::unique_lock<std::mutex> lock(myElevatorsMutex);
@@ -20,19 +17,18 @@ Threads::ElevatorWorker()
 			myElevatorsWork.clear();
 		}
 
-		for(auto wrk : work)
+		for (auto wrk : work)
 		{
 			wrk();
 		}
 	}
 }
 
-void
-Threads::HumansWorker()
+void Threads::HumansWorker()
 {
 	std::vector<std::function<void()>> work;
 
-	while(true)
+	while (true)
 	{
 		{
 			std::unique_lock<std::mutex> lock(myHumansMutex);
@@ -42,30 +38,27 @@ Threads::HumansWorker()
 			myHumansWork.clear();
 		}
 
-		for(auto wrk : work)
+		for (auto wrk : work)
 		{
 			wrk();
 		}
 	}
 }
 
-void
-Threads::Start()
+void Threads::Start()
 {
 	myElevatorsThread = std::thread(&Threads::ElevatorWorker, this);
 	myHumansThread = std::thread(&Threads::HumansWorker, this);
 }
 
-void
-Threads::Wait()
+void Threads::Wait()
 {
 	myElevatorsThread.join();
 	myHumansThread.join();
 }
 
-void
-Threads::AddElevatorWork(
-	std::function<void()>	aWork)
+void Threads::AddElevatorWork(
+	std::function<void()> aWork)
 {
 	{
 		std::unique_lock<std::mutex> lock(myElevatorsMutex);
@@ -75,9 +68,8 @@ Threads::AddElevatorWork(
 	myElevatorsCv.notify_all();
 }
 
-void
-Threads::AddHumanWork(
-	std::function<void()>	aWork)
+void Threads::AddHumanWork(
+	std::function<void()> aWork)
 {
 	{
 		std::unique_lock<std::mutex> lock(myHumansMutex);
@@ -85,4 +77,16 @@ Threads::AddHumanWork(
 	}
 
 	myHumansCv.notify_all();
+}
+
+void Threads::Timer(std::function<void()> func, unsigned int interval)
+{
+	std::thread([func, interval]() {
+		while (true)
+		{
+			func();
+			std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+		}
+	})
+		.detach();
 }
