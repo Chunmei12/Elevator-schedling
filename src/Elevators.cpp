@@ -14,7 +14,7 @@ void Elevators::Start()
 	REGISTER_ELEVATOR(MessageElevatorStep, Elevators::OnMessageElevatorStep);
 	REGISTER_ELEVATOR(MessageElevatorRequest, Elevators::OnMessageElevatorRequest);
 
-	//initialize 3 elevator 
+	//initialize 3 elevator
 	myElevators.push_back(Elevator{1, 10, 6, Direction::Down});
 	myElevators.push_back(Elevator{2, 10, 1, Direction::Up});
 	myElevators.push_back(Elevator{3, 10, 8, Direction::Down});
@@ -39,7 +39,7 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 {
 	unsigned int elevatorId = 0;
 	int minTimes = -1;
-	
+
 	int currentFloor;
 	int currentDirection;
 
@@ -56,68 +56,28 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 		int times = -1;
 
 		// FD-SCAN ALGORITHEM
-		if (aMessage.myDirection == currentDirection)
+		bool condition1 = (aMessage.myDirection == currentDirection && aMessage.myDirection == Direction::Down && aMessage.myFloor <= currentFloor) || (aMessage.myDirection == currentDirection && aMessage.myDirection == Direction::Up && aMessage.myFloor >= currentFloor) || (aMessage.myDirection != currentDirection && aMessage.myDirection == Direction::Down && topInUpList == 0) || (aMessage.myDirection != currentDirection && aMessage.myDirection == Direction::Up && bottomInDownList == 0);
+		bool condition2 = (aMessage.myDirection == currentDirection && aMessage.myDirection == Direction::Down && aMessage.myFloor > currentFloor) || (aMessage.myDirection == currentDirection && aMessage.myDirection == Direction::Up && aMessage.myFloor < currentFloor);
+		bool condition3 = (aMessage.myDirection != currentDirection && aMessage.myDirection == Direction::Down && topInUpList != 0);
+		bool condition4 = (aMessage.myDirection != currentDirection && aMessage.myDirection == Direction::Up && bottomInDownList != 0);
+
+		if (condition1)
 		{
-			if (aMessage.myDirection == Direction::Down)
-			{
-				if (aMessage.myFloor <= currentFloor)
-				{
-					// the down direction, and the new call is in the current way
-					times = std::abs((int)aMessage.myFloor - currentFloor);
-				}
-				else
-				{
-					// the down  direction, and the new call is out of the current way
-					times = std::abs(currentFloor - bottomInDownList + topInUpList - bottomInUpList + topInDownList - (int)aMessage.myFloor);
-				}
-			}
-
-			if (aMessage.myDirection == Direction::Up)
-			{
-				if (aMessage.myFloor >= currentFloor)
-				{
-					// the up direction, and the new call is in the current way
-					times = std::abs((int)aMessage.myFloor - currentFloor);
-				}
-				else
-				{
-					// the up direction, and the new call is out of the current way
-					times = std::abs(topInUpList - currentFloor + topInDownList - bottomInDownList + (int)aMessage.myFloor - bottomInDownList);
-				}
-			}
+			times = std::abs((int)aMessage.myFloor - currentFloor);
 		}
-
-		if (aMessage.myDirection != currentDirection)
+		else if (condition2)
 		{
-			if (aMessage.myDirection == Direction::Down)
-			{
-				if (topInUpList == 0)
-				{
-					// the opposite direction, no up call waiting
-					times = std::abs(currentFloor - (int)aMessage.myFloor);
-				}
-				else
-				{
-					// the opposite direction, has other up call waiting
-					times = std::abs(2 * topInUpList - currentFloor - (int)aMessage.myFloor);
-				}
-			}
-
-			if (aMessage.myDirection == Direction::Up)
-			{
-				if (topInUpList == 0)
-				{
-					// the opposite direction,no down call waiting
-					times = std::abs(currentFloor - (int)aMessage.myFloor);
-				}
-				else
-				{
-					// the opposite direction, has other down call waiting
-					times = std::abs(currentFloor + (int)aMessage.myFloor - 2 * bottomInDownList);
-				}
-			}
+			times = std::abs((int)aMessage.myFloor - currentFloor) + std::abs(topInDownList - bottomInDownList + topInUpList - bottomInUpList);
 		}
-
+		else if (condition3)
+		{
+			times = std::abs(2 * topInUpList - currentFloor - (int)aMessage.myFloor);
+		}
+		else if (condition4)
+		{
+			times = std::abs(currentFloor + (int)aMessage.myFloor - 2 * bottomInDownList);
+		}
+		
 		//get the elevator who costs the minimum of time
 		if (minTimes > times || minTimes == -1)
 		{
