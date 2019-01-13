@@ -24,13 +24,15 @@ class Elevator
 		const Direction aDirection);
 
 	unsigned int CurrentFloor() const;
-	std::list<unsigned int> UpList() const;
-	std::list<unsigned int> DownList() const;
-	void InsertUpList(const unsigned int aFloorId);
-	void InsertDownList(const unsigned int aFloorId);
 	Direction CurrentDirection() const;
-	bool HasWork() const;
 
+	std::list<unsigned int> UpList() const;  //get up list
+	std::list<unsigned int> DownList() const; //get down list
+
+	void InsertUpList(const unsigned int aFloorId); //insert one into the up list
+	void InsertDownList(const unsigned int aFloorId); //insert one into the down list
+	
+	bool HasWork() const;
 	void Step();
 	unsigned int Id() const;
 
@@ -40,7 +42,7 @@ class Elevator
 	unsigned int myId;
 	unsigned int myFloorCount;
 	unsigned int myCurrentFloor;
-	std::list<unsigned int> upList;
-	std::list<unsigned int> downList;
+	std::list<unsigned int> upList;  // up list
+	std::list<unsigned int> downList; //down list
 	Direction myCurrentDirection;
 };

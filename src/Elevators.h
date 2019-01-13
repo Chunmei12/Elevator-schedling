@@ -12,15 +12,14 @@ class Elevators
 
 	void Start();
 
-	void OnMessageElevatorCall(
-		const MessageElevatorCall &aMessage);
-	void OnMessageElevatorRequest(
-		const MessageElevatorRequest &aMessage);
+	void OnMessageElevatorCall(const MessageElevatorCall &aMessage);
+	
+	void OnMessageElevatorRequest(const MessageElevatorRequest &aMessage);
 
-	void OnMessageElevatorStep(
-		const MessageElevatorStep &aMessage);
+	void OnMessageElevatorStep(const MessageElevatorStep &aMessage);
 
   void Scheduling(const MessageElevatorCall &aMessage);
+
   private:
 	std::vector<Elevator> myElevators;
 };

@@ -14,9 +14,11 @@ void Elevators::Start()
 	REGISTER_ELEVATOR(MessageElevatorStep, Elevators::OnMessageElevatorStep);
 	REGISTER_ELEVATOR(MessageElevatorRequest, Elevators::OnMessageElevatorRequest);
 
+	//initialize 3 elevator 
 	myElevators.push_back(Elevator{1, 10, 6, Direction::Down});
 	myElevators.push_back(Elevator{2, 10, 1, Direction::Up});
 	myElevators.push_back(Elevator{3, 10, 8, Direction::Down});
+
 	{
 		MessageElevatorStep message;
 		SEND_TO_ELEVATORS(message);
@@ -30,24 +32,29 @@ void Elevators::Start()
 
 void Elevators::OnMessageElevatorCall(const MessageElevatorCall &aMessage)
 {
-	Scheduling(aMessage); 
+	Scheduling(aMessage);
 }
 
 void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 {
 	unsigned int elevatorId = 0;
 	int minTimes = -1;
+	
 	int currentFloor;
 	int currentDirection;
+
 	for (auto &elevator : myElevators)
 	{
 		currentFloor = (int)elevator.CurrentFloor();
 		currentDirection = elevator.CurrentDirection();
+
 		int topInUpList = elevator.UpList().empty() ? 0 : elevator.UpList().back();
 		int bottomInUpList = elevator.UpList().empty() ? 0 : elevator.UpList().front();
 		int topInDownList = elevator.DownList().empty() ? 0 : elevator.DownList().back();
 		int bottomInDownList = elevator.DownList().empty() ? 0 : elevator.DownList().front();
+
 		int times = -1;
+
 		// FD-SCAN ALGORITHEM
 		if (aMessage.myDirection == currentDirection)
 		{
@@ -64,6 +71,7 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 					times = std::abs(currentFloor - bottomInDownList + topInUpList - bottomInUpList + topInDownList - (int)aMessage.myFloor);
 				}
 			}
+
 			if (aMessage.myDirection == Direction::Up)
 			{
 				if (aMessage.myFloor >= currentFloor)
@@ -94,6 +102,7 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 					times = std::abs(2 * topInUpList - currentFloor - (int)aMessage.myFloor);
 				}
 			}
+
 			if (aMessage.myDirection == Direction::Up)
 			{
 				if (topInUpList == 0)
@@ -117,13 +126,12 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 		}
 	}
 
-	// insert the new external call into the elevator list was selected by the FD-SCAN algorithem
+	// insert the new external call into the elevator list was selected before
 	for (auto &elevator : myElevators)
 	{
-		
+
 		if (elevator.Id() == elevatorId)
 		{
-			Log(elevatorId );
 			if (aMessage.myDirection == Direction::Up)
 			{
 				elevator.InsertUpList(aMessage.myFloor);
@@ -140,23 +148,25 @@ void Elevators::Scheduling(const MessageElevatorCall &aMessage)
 void Elevators::OnMessageElevatorRequest(const MessageElevatorRequest &aMessage)
 {
 	// Implement me!
-	// make a request
 	int currentFloor;
 	int currentDirection;
+
 	for (auto &elevator : myElevators)
 	{
 		currentFloor = elevator.CurrentFloor();
 		currentDirection = elevator.CurrentDirection();
-		if (elevator.Id() == aMessage.myElevatorId)
+
+		//make a up request
+		if (elevator.Id() == aMessage.myElevatorId && currentDirection == Direction::Up)
 		{
-			if (currentDirection == Direction::Up)
-			{
-				elevator.InsertUpList(aMessage.myFloor);
-			}
-			else
-			{
-				elevator.InsertDownList(aMessage.myFloor);
-			}
+			elevator.InsertUpList(aMessage.myFloor);
+			break;
+		}
+
+		//make a down request
+		if (elevator.Id() == aMessage.myElevatorId && currentDirection == Direction::Down)
+		{
+			elevator.InsertDownList(aMessage.myFloor);
 			break;
 		}
 	}
@@ -169,7 +179,6 @@ void Elevators::OnMessageElevatorStep(const MessageElevatorStep &aMessage)
 	{
 		Log("[Elevators", elevator.Id(), "] Step", elevator.ToString());
 		elevator.Step();
-	
 	}
 
 	MessageElevatorStep message;

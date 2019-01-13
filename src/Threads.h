@@ -16,28 +16,29 @@ class Threads
 	}
 
 	void Start();
-	void AddElevatorWork(
-		std::function<void()> aWork);
-	void AddHumanWork(
-		std::function<void()> aWork);
+
+	void AddElevatorWork(std::function<void()> aWork);
+	void AddHumanWork(std::function<void()> aWork);
+
+	//excute the function at regular times
+	void Timer(std::function<void()> func, unsigned int interval); 
 
 	void Wait();
-    void Timer(std::function<void()> func, unsigned int interval);
+
   private:
 	Threads(){};
 
 	void ElevatorWorker();
 
 	std::thread myElevatorsThread;
-	std::vector< std::function<void()> > myElevatorsWork;
+	std::vector<std::function<void()>> myElevatorsWork;
 	std::condition_variable myElevatorsCv;
 	std::mutex myElevatorsMutex;
 
 	void HumansWorker();
 
 	std::thread myHumansThread;
-	std::vector< std::function<void()> > myHumansWork;
+	std::vector<std::function<void()>> myHumansWork;
 	std::condition_variable myHumansCv;
 	std::mutex myHumansMutex;
-
 };

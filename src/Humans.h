@@ -15,10 +15,10 @@ enum HumanState
 
 class Human
 {
-  public:
+public:
 	Human(
-		const unsigned int aFloor,
-		const unsigned int aDestinationFloor);
+			const unsigned int aFloor,
+			const unsigned int aDestinationFloor);
 
 	unsigned int myFloor;
 	unsigned int myDestinationFloor;
@@ -32,7 +32,7 @@ class Human
 	unsigned int GetWaitingCounter() const;
 	unsigned int GetTravelingCounter() const;
 
-  private:
+private:
 	HumanState myState;
 	unsigned int myWaitingCounter;
 	unsigned int myTravelingCounter;
@@ -40,23 +40,21 @@ class Human
 
 class Humans
 {
-  public:
+public:
 	Humans();
 
 	void Start();
 
-	void OnMessageElevatorReady(
-		const MessageElevatorReady &aMessage);
+	void OnMessageElevatorReady(const MessageElevatorReady &aMessage);
 
-	void OnMessageElevatorArrived(
-		const MessageElevatorArrived &aMessage);
+	void OnMessageElevatorArrived(const MessageElevatorArrived &aMessage);
 
-	void OnMessageHumanStep(
-		const MessageHumanStep &aMessage);
-  
+	void OnMessageHumanStep(const MessageHumanStep &aMessage);
+
+  //keep generating random humans so it runs infinitely
 	void GenerateHuman();
 
-  private:
+private:
 	std::vector<Human> myHumans;
 
 	void PrivPrintTimers();

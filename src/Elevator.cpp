@@ -19,48 +19,51 @@ Elevator::Elevator(
 {
 	Log("[Elevator]", myId, "Created", ToString());
 }
-//new function to insert the new call or request into the  up list
+
+//insert the new call or request into the  up list
 void Elevator::InsertUpList(const unsigned int aFloorId)
 {
 	upList.push_back(aFloorId);
 	upList.sort();
 }
-//new function to insert the new call or request into the  down list
+
+//insert the new call or request into the  down list
 void Elevator::InsertDownList(const unsigned int aFloorId)
 {
 	downList.push_back(aFloorId);
 	downList.sort();
 }
+
 //get up list
 std::list<unsigned int> Elevator::UpList() const
 {
 	return upList;
 }
+
 //get down list
 std::list<unsigned int> Elevator::DownList() const
 {
 	return downList;
 }
-unsigned int
-Elevator::CurrentFloor() const
+
+unsigned int Elevator::CurrentFloor() const
 {
 	return myCurrentFloor;
 }
 
-Direction
-Elevator::CurrentDirection() const
+Direction Elevator::CurrentDirection() const
 {
 	return myCurrentDirection;
 }
 
 bool Elevator::HasWork() const
 {
+	// Implement me!
 	if (!upList.empty() || !downList.empty())
 	{
 		return true;
 	}
 	return false;
-	// Implement me!
 }
 
 void Elevator::Step()
@@ -72,13 +75,15 @@ void Elevator::Step()
 		if (myCurrentDirection == Direction::Down)
 		{
 			//check if there is a call or request at current floor
-			std::list<unsigned int>::iterator it = std::find(downList.begin(), downList.end(), myCurrentFloor); //searche
+			std::list<unsigned int>::iterator it = std::find(downList.begin(), downList.end(), myCurrentFloor);
 			while (it != downList.end())
 			{
 				downList.erase(it);
+				it = std::find(downList.begin(), downList.end(), myCurrentFloor);
+				// notify the human one elevator arrived
 				MessageElevatorArrived message = {myId, myCurrentFloor, Direction::Down};
 				SEND_TO_HUMANS(message);
-				it = std::find(downList.begin(), downList.end(), myCurrentFloor);
+				
 			}
 			// change the elevator direction from down to up
 			// 1. when the floor arrrived at the first floor
@@ -97,13 +102,15 @@ void Elevator::Step()
 		else if (myCurrentDirection == Direction::Up)
 		{
 			//check if there is a call or request at current floor
-			std::list<unsigned int>::iterator it = std::find(upList.begin(), upList.end(), myCurrentFloor); //searche
+			std::list<unsigned int>::iterator it = std::find(upList.begin(), upList.end(), myCurrentFloor);
 			while (it != upList.end())
 			{
 				upList.erase(it);
+				it = std::find(upList.begin(), upList.end(), myCurrentFloor);
+
+				// notify the human one elevator arrived
 				MessageElevatorArrived message = {myId, myCurrentFloor, Direction::Up};
 				SEND_TO_HUMANS(message);
-				it = std::find(upList.begin(), upList.end(), myCurrentFloor);
 			}
 
 			// change the elevator direction from up to down

@@ -57,8 +57,7 @@ void Threads::Wait()
 	myHumansThread.join();
 }
 
-void Threads::AddElevatorWork(
-	std::function<void()> aWork)
+void Threads::AddElevatorWork(std::function<void()> aWork)
 {
 	{
 		std::unique_lock<std::mutex> lock(myElevatorsMutex);
@@ -79,6 +78,7 @@ void Threads::AddHumanWork(
 	myHumansCv.notify_all();
 }
 
+//excute the function at regular times
 void Threads::Timer(std::function<void()> func, unsigned int interval)
 {
 	std::thread([func, interval]() {
@@ -87,6 +87,5 @@ void Threads::Timer(std::function<void()> func, unsigned int interval)
 			func();
 			std::this_thread::sleep_for(std::chrono::milliseconds(interval));
 		}
-	})
-		.detach();
+	}).detach();
 }
