@@ -72,6 +72,8 @@ void Humans::Start()
 
 	//refuse the two same floor number, initial state
 	myHumans.push_back(Human(1, 4));
+	myHumans.push_back(Human(8, 5));
+	myHumans.push_back(Human(7, 9));
 }
 
 void Humans::OnMessageElevatorReady(const MessageElevatorReady &aMessage)
